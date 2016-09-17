@@ -170,7 +170,7 @@ public class Bean6 {
 以上所有测试都是使用Gson以及FastJson标准的使用方法，并没有做任何差异化配置。
 测试设备是：魅蓝3s手机，android5.1,Flyme5.1.5.0A
 
-
+作者：vectorzeng
 
 
 
