@@ -1,7 +1,7 @@
 # GSON vs FastJson vs JackSon（on android）
 ---
 
-### 对应版本和大小
+### 对应版本和jar大小
 
 | lib | size(b) |
 | ------| ------ |
@@ -9,7 +9,10 @@
 | com.alibaba:fastjson:1.1.54.android | 203475 |
 | jackson-2.7.3(core+databind+annotations) |252518+1202276+50897=1505691|
 
-jackson 1.5M，尽管他高效的反序列化（比GSON要快很多），功能齐全以及非常好的拓展性，但包太大往往直接被android开发人员嫌弃继而抛弃。
+jackson 1.5M，尽管他高效的反序列化（比GSON要快很多），功能齐全以及非常好的拓展性，但依赖太多导致jar太大往往直接被android开发人员嫌弃继而抛弃。
+
+
+
 
 ###国内Top500和Google Play Top200 Android应用FastJson Gson JackSon使用情况：
 ---
@@ -20,7 +23,9 @@ jackson 1.5M，尽管他高效的反序列化（比GSON要快很多），功能�
 |google paly top200| 57 | 0 | 15 |
 
 数据来源：[国内top500点这里](http://mp.weixin.qq.com/s?__biz=MzA5OTMxMjQzMw==&mid=2648112527&idx=1&sn=b23c1b5f3e32e343ad96d705bd4d63ff&scene=2&srcid=0711GL3B90iyRPmjRKTBN1I0&from=timeline&isappinstalled=0#wechat_redirect)
-[google play top 200](http://mp.weixin.qq.com/s?__biz=MzA5OTMxMjQzMw==&mid=2648112540&idx=1&sn=c2dc3d17f561337ce9b0fe93537d769f&scene=1&srcid=09177ZRJvPhvNdC2rPIyPFbD#rd)
+[google play top 200点这里](http://mp.weixin.qq.com/s?__biz=MzA5OTMxMjQzMw==&mid=2648112540&idx=1&sn=c2dc3d17f561337ce9b0fe93537d769f&scene=1&srcid=09177ZRJvPhvNdC2rPIyPFbD#rd)
+
+
 
 
 ###github数据对比,2016年9月
@@ -33,8 +38,11 @@ jackson 1.5M，尽管他高效的反序列化（比GSON要快很多），功能�
 通过github上的数据看出GSON和FastJson都很受欢迎，社区的人都比较活跃。但从官方提供在github上的文档来看,很明显GSON远比FastJson要详细，通熟易懂。虽然FastJson有中文和英文两份文档，但是我个人感觉GSON的文档更符合程序员的口味。
 
 
----
+
+
+
 ### 效率对比GSON vs FastJson
+---
 一段非常简单的json结构，反序列化对比：
 
 ```json
@@ -72,13 +80,17 @@ jackson 1.5M，尽管他高效的反序列化（比GSON要快很多），功能�
 | 0 | 0 | 0 |
 
 之前的demo测试的FastJson比GSON快6倍，是因为我对GSON的使用不当导致的差异。实际对于上面这种常见的小数据来看并没有6倍。数据告诉我们FastJson确实比GSON要快。
-官方提供数据，他们的测试可能更全面一些。但他们并不是针对android版本测试。
+官方提供数据，他们的测试可能更全面一些。但他们并不是针对android版本的测试。
 [https://github.com/alibaba/fastjson/wiki/%E5%90%84%E7%A7%8DJSON%E5%BA%93%E7%9A%84%E6%AF%94%E8%BE%83](https://github.com/alibaba/fastjson/wiki/%E5%90%84%E7%A7%8DJSON%E5%BA%93%E7%9A%84%E6%AF%94%E8%BE%83)
+
+
 
 ### 容错：
 ---
 
-#### 容错json字段缺失与冗余，序列化以及反序列化时，Gson以及FastJson都有很好的容错性
+#### json字段缺失与冗余，序列化以及反序列化时，Gson以及FastJson都有很好的容错性
+
+
 
 ---
 #### 反序列化时类型转换容错测试
@@ -114,17 +126,20 @@ jackson 1.5M，尽管他高效的反序列化（比GSON要快很多），功能�
 FastJson和Gson都可以通过二次开发定制类型转换的结果。
 
 
+
+
 ---
 ### Gson FastJson使用中的一些差异：
-- Gson对所有访问权限的成员变量都可以序列化和反序列化，FastJson只对有访问权限的成员变量或者有配有set*方法的成员变量才会反序列化。只对有访问权限的成员变量或者配有get*方法的成员变量才会序列化。如下举例
+- Gson对所有访问权限的成员变量都可以序列化和反序列化，FastJson只对有访问权限的成员变量或者有配有public set\*方法的成员变量才会反序列化。只对有访问权限的成员变量或者配有public get\*方法的成员变量才会序列化。
+有点难理解，看例子就一目了然了如下举例
 
 ``` java
 //Bean.java
 class Bean{
-    private int age = 99;//private访问权限，既没有getAge(),也没有setAge()方法；FastJson对这种属性即不序列化，也不反序列化
+    private int age = 99;				//private访问权限，既没有getAge(),也没有setAge()方法；FastJson对这种属性即不序列化，也不反序列化
     public String name = "vz123";
-    private boolean isMan = true;//private权限，只有getIsMan()，没有setIsMan()方法，这种属性在FastJson中只会序列化并不会反序列化
-    private boolean isTrue = true;//private权限，没有getIsTrue()，只有setIsTrue(),FastJson对这种属性只会反序列化，并不会序列化
+    private boolean isMan = true;		//private权限，只有getIsMan()，没有setIsMan()方法，这种属性在FastJson中只会序列化并不会反序列化
+    private boolean isTrue = true;		//private权限，没有getIsTrue()，只有setIsTrue(),FastJson对这种属性只会反序列化，并不会序列化
     public boolean getIsMan(){
         return this.isMan;
     }
@@ -140,10 +155,10 @@ class Bean{
 ```
 
 
-默认情况下，在序列化和反序列化的规则上FastJson更为复杂。而Gson简单明了通熟易懂。而且以上规则官方并没有文档中阐述，而是靠开发人员自己使用中发觉。
+默认情况下，在序列化和反序列化的规则上FastJson更为复杂。而Gson简单明了通熟易懂。而且以上规则官方并没有在文档中阐述，而是靠开发人员自己使用中发觉。不知道FastJson的作者是故意如此设计还是无意为止。
 
 ---
-序列化属性名的差异：Gson vs FastJson
+- 序列化属性名的差异：Gson vs FastJson
 
 ```java
 public class Bean6 {
@@ -163,10 +178,15 @@ public class Bean6 {
 ```
 
 由上面的测试结果可以推测，FastJson以一种简单粗暴的方式：
-    将所有的可以访问的成员变量以及成员方法都给序列化了，而且以一种简单粗暴的方式生成了json的属性名。
+    将所有的可以访问的成员变量以及get/*成员方法都给序列化了，而且以一种简单粗暴的方式生成了json的属性名。
 而Gson始终以成员变量保持一致，json的属性名也与成员变量名保持一致。
 
 
+
+
+------
+------
+---------
 以上所有测试都是使用Gson以及FastJson标准的使用方法，并没有做任何差异化配置。
 测试设备是：魅蓝3s手机，android5.1,Flyme5.1.5.0A
 
